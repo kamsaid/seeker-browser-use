@@ -4,13 +4,12 @@
  */
 
 import { useState, useCallback } from 'react';
-import { createOpenAIBrowserAgent, runOpenAIBrowserTask } from '@/agent/browser-use/openai-model';
 import { openAIConfig, browserUseConfig } from '@/lib/config';
 import { TaskDetails } from '@/agent/browser-use/types';
 
 interface UseOpenAIBrowserTaskProps {
   /**
-   * OpenAI API key (defaults to config)
+   * OpenAI API key (optional, will be sent to the server)
    */
   apiKey?: string;
   /**
@@ -74,34 +73,32 @@ export function useOpenAIBrowserTask({
   const runTask = useCallback(async (task: string) => {
     setLoading(true);
     setError(null);
-    
-    try {
-      // Validate API key
-      if (!apiKey) {
-        throw new Error('OpenAI API key is missing or invalid');
-      }
 
-      // Validate task
+    try {
       if (!task || task.trim() === '') {
         throw new Error('Task description is required');
       }
-      
-      // Run the task using the OpenAI-powered Browser-Use agent
-      const taskResult = await runOpenAIBrowserTask({
-        // User's question/instruction
-        question: task,
-        // OpenAI API credentials
-        openAIApiKey: apiKey,
-        // Browser-Use service credentials
-        browserUseApiKey: browserUseConfig.apiKey,
-        browserUseBaseUrl: browserUseConfig.baseUrl,
-        // LLM settings
-        model,
-        temperature,
-        useVision
+
+      const response = await fetch('/api/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: task,
+          model,
+          temperature,
+          useVision,
+          browserUseBaseUrl: browserUseConfig.baseUrl,
+          openAIApiKey: apiKey,
+          browserUseApiKey: browserUseConfig.apiKey,
+        }),
       });
-      
-      // Store both the output string and full task details
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Request failed');
+      }
+
+      const taskResult: TaskDetails = await response.json();
       setResult(taskResult.output || '');
       setTaskDetails(taskResult);
     } catch (err: any) {
