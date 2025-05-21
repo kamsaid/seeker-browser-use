@@ -4,14 +4,23 @@ import { runOpenAIBrowserTask, OpenAIBrowserAgentConfig } from '../../../agent/b
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { question, taskDescription, model, temperature, useVision, browserUseBaseUrl } = body;
+    const {
+      question,
+      taskDescription,
+      model,
+      temperature,
+      useVision,
+      browserUseBaseUrl,
+      openAIApiKey: bodyOpenAIKey,
+      browserUseApiKey: bodyBrowserUseKey,
+    } = body;
 
     if (!question) {
       return NextResponse.json({ error: 'Question is required' }, { status: 400 });
     }
 
-    const openAIApiKey = process.env.OPENAI_API_KEY;
-    const browserUseApiKey = process.env.BROWSER_USE_API_KEY;
+    const openAIApiKey = bodyOpenAIKey || process.env.OPENAI_API_KEY;
+    const browserUseApiKey = bodyBrowserUseKey || process.env.BROWSER_USE_API_KEY;
 
     if (!openAIApiKey) {
       console.error('OpenAI API key is not configured on the server.');

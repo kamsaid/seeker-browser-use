@@ -120,12 +120,7 @@ export function useBrowserTaskManager({
     }
 
     if (usingOpenAI) {
-      // Check for OpenAI API key
-      if (!openAIKey) {
-        throw new Error('OpenAI API key is required when using GPT-4o integration');
-      }
-
-      // Use OpenAI-powered agent
+      // Use OpenAI-powered agent (executed on the server)
       await openAIRunTask(taskDescription);
       setUsingOpenAI(true);
     } else {

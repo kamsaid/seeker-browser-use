@@ -78,8 +78,14 @@ Seeker now supports OpenAI's GPT-4o model for enhanced browser automation perfor
    ```
    OPENAI_MODEL=gpt-4o
    OPENAI_TEMPERATURE=0.0
-   OPENAI_USE_VISION=true
-   ```
+  OPENAI_USE_VISION=true
+  ```
+
+4. Tasks that use GPT-4o are executed through the `/api/agent` route. This
+   server endpoint runs the OpenAI powered browser agent and returns detailed
+   steps along with a final answer. You can optionally pass your API keys in the
+   request body, otherwise the server will use keys defined in environment
+   variables.
 
 ### Benefits of OpenAI Integration
 
