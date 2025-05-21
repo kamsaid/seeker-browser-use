@@ -11,7 +11,9 @@ export async function POST(request: Request) {
     }
 
     const openAIApiKey = process.env.OPENAI_API_KEY;
-    const browserUseApiKey = process.env.BROWSER_USE_API_KEY;
+    // Support either server-only or public env var for Browser-Use API key
+    const browserUseApiKey =
+      process.env.BROWSER_USE_API_KEY || process.env.NEXT_PUBLIC_BROWSER_USE_API_KEY;
 
     if (!openAIApiKey) {
       console.error('OpenAI API key is not configured on the server.');
